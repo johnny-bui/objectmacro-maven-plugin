@@ -104,7 +104,8 @@ public class ObjectMacroCaller extends AbstractMojo {
 					}
 				}
 				for(String d: dirs){
-					getLog().info("add " + d + " to resources");
+					getLog().info("add " + d + " to resources and test");
+					project.addTestCompileSourceRoot(d);
 					project.addCompileSourceRoot(d);
 				}
 			}else{
