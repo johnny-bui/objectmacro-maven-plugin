@@ -8,7 +8,7 @@ import java.util.List;
  * @author phucluoi
  * @version Feb 3, 2013
  */
-public class Argument {
+public final class Argument {
 	private List<String> argv;
 	private String l;
 	private String d;

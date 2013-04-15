@@ -1,8 +1,6 @@
 package de.htwds.objectmacroplugin;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProjectHelper;
@@ -20,7 +18,7 @@ import org.sablecc.objectmacro.launcher.ObjectMacro;
  * Call ObjectMacro to generate Java file from ObjectMacro file.
  *
  * @author Hong Phuc Bui
- * @version 1.0-SNAPSHOT
+ * @version 2.0-SNAPSHOT
  *
  * @phase generate-resources
  */
@@ -53,7 +51,7 @@ public class ObjectMacroCaller extends AbstractMojo {
 	private String informative;
 	
 	@Parameter(required=true)
-	private List<Map> templates;
+	private String template;
 
 	@Parameter(defaultValue="${component.org.apache.maven.project.MavenProjectHelper}")
 	private MavenProjectHelper projectHelper;
@@ -92,27 +90,27 @@ public class ObjectMacroCaller extends AbstractMojo {
 				getLog().warn("project is null");
 			}
 			constructOutDir();
-			if (templates != null){
-				Set<String> dirs = new HashSet<String>();
-				for (Map m : templates) {
-					Argument argv = parseArgument(m);
+			//if (templates != null){
+				//for (Map m : templates) {
+					Argument argv = parseArgument(/*m*/);
 					if (argv != null) {
 						getLog().info("call ObjectMacro with argv:");
 						getLog().info(argv.getArgv().toString());
 						ObjectMacro.compile(argv.getStringArgv());
-						dirs.add(argv.getDirectory());
+
+						getLog().info("add " + argv.getDirectory() + " to resources and test");
+						project.addCompileSourceRoot(argv.getDirectory());
+						project.addTestCompileSourceRoot(argv.getDirectory());
 					}
-				}
-				for(String d: dirs){
-					getLog().info("add " + d + " to resources and test");
-					project.addCompileSourceRoot(d);
-					project.addTestCompileSourceRoot(d);
-				}
-			}else{
+				//}
+				//for(String d: dirs){
+					
+				//}
+			//}else{
 				//TODO: What is the convenient behavior if there are not 
 				// templated files? I just put an warning out on screen.
-				getLog().warn("no tag <templates> found");
-			}
+				//getLog().warn("no tag <templates> found");
+			//}
 		} catch (RuntimeException ex) {
 			throw new MojoFailureException("Compile template file error: " + ex.getMessage(), ex);
 		} catch (Exception ex) {
@@ -121,28 +119,28 @@ public class ObjectMacroCaller extends AbstractMojo {
 
 	}
 
-	private Argument parseArgument(Map m) {
+	private Argument parseArgument(/*Map m*/) {
 		Argument a = new Argument();
 		// the template file
 		// TODO: optimize here, check the tag <file> first.
-		String file = (String) m.get("file");
+		String file = template;  //m.get("file");
 		if (file == null) {
 			getLog().warn("Configuration fail, cannot find the tag <file>");
 			return null;
 		} else {
 			if (isFileNameValid(file)) {
 				// option "-t language"
-				String l = (String) m.get("language");
+				String l = this.language; //(String) m.get("language");
 				String localLanguage = (isOptionValid(l)) ? l.trim() : language;
 				a.setLanguage(localLanguage);
 				
 				// option "-d directory" // TODO: check validation directory
-				String d = (String) m.get("directory");
+				String d = this.directory; //(String) m.get("directory");
 				String localDirectory = (isOptionValid(d)) ? d.trim() : directory;
 				a.setDirectory(localDirectory);
 				
 				// option "-p packagesname"
-				String p = (String) m.get("packagename");
+				String p = this.packagename; //m.get("packagename");
 				if (p != null) {
 					if (isPackageNameValid(p)) {
 						String localPackagename = p.trim();
@@ -161,25 +159,15 @@ public class ObjectMacroCaller extends AbstractMojo {
 				
 				// option "--generate-code" or "--no-code"
 				String localGenerateCode = generateCode ? GEN_CODE : NO_CODE;
-				String g = (String) m.get("generateCode");
-				if (g != null) {
-					g = g.trim().toLowerCase();
-					localGenerateCode = (g.equals("true") || g.equals("generate-code")) ? GEN_CODE : NO_CODE;
-				}
 				a.setGenerateCode(localGenerateCode);
 				
 				// option "--strict" or "--lenient"
 				String localStrict = strict ? STRICT : LENIENT;
-				String s = (String) m.get("strict");
-				if (s != null) {
-					s = s.trim().toLowerCase();
-					localStrict = (s.equals("true") || s.equals("strict")) ? STRICT : LENIENT;
-				}
 				a.setStrict(localStrict);
 				
 				// option "--quiet" or "--informative" or "--verbose"
 				String localInformative = INFORMATIVE;
-				String i = (String) m.get("informative");
+				String i = informative;
 				if (i != null) {
 					i = i.trim().toLowerCase();
 					if (i.equals("quiet")) {
