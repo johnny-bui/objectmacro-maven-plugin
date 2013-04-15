@@ -90,27 +90,21 @@ public class ObjectMacroCaller extends AbstractMojo {
 				getLog().warn("project is null");
 			}
 			constructOutDir();
-			//if (templates != null){
-				//for (Map m : templates) {
-					Argument argv = parseArgument(/*m*/);
-					if (argv != null) {
-						getLog().info("call ObjectMacro with argv:");
-						getLog().info(argv.getArgv().toString());
-						ObjectMacro.compile(argv.getStringArgv());
+			
+			Argument argv = parseArgument(/*m*/);
+			if (argv != null) {
+				getLog().info("call ObjectMacro with argv:");
+				getLog().info(argv.getArgv().toString());
+				ObjectMacro.compile(argv.getStringArgv());
 
-						getLog().info("add " + argv.getDirectory() + " to resources and test");
-						project.addCompileSourceRoot(argv.getDirectory());
-						project.addTestCompileSourceRoot(argv.getDirectory());
-					}
-				//}
-				//for(String d: dirs){
-					
-				//}
-			//}else{
+				getLog().info("add " + argv.getDirectory() + " to resources and test");
+				project.addCompileSourceRoot(argv.getDirectory());
+				project.addTestCompileSourceRoot(argv.getDirectory());
+			}else{
 				//TODO: What is the convenient behavior if there are not 
 				// templated files? I just put an warning out on screen.
-				//getLog().warn("no tag <templates> found");
-			//}
+				getLog().warn("no tag <template> found");
+			}
 		} catch (RuntimeException ex) {
 			throw new MojoFailureException("Compile template file error: " + ex.getMessage(), ex);
 		} catch (Exception ex) {
@@ -119,9 +113,8 @@ public class ObjectMacroCaller extends AbstractMojo {
 
 	}
 
-	private Argument parseArgument(/*Map m*/) {
+	private Argument parseArgument() {
 		Argument a = new Argument();
-		// the template file
 		// TODO: optimize here, check the tag <file> first.
 		String file = template;  //m.get("file");
 		if (file == null) {
@@ -130,31 +123,27 @@ public class ObjectMacroCaller extends AbstractMojo {
 		} else {
 			if (isFileNameValid(file)) {
 				// option "-t language"
-				String l = this.language; //(String) m.get("language");
-				String localLanguage = (isOptionValid(l)) ? l.trim() : language;
-				a.setLanguage(localLanguage);
+				if(isOptionValid(language)){
+					String localLanguage = language.trim();
+					a.setLanguage(localLanguage);
+				}else{
+					throw new RuntimeException(language + " is not a valid option for output language");
+				}
 				
 				// option "-d directory" // TODO: check validation directory
-				String d = this.directory; //(String) m.get("directory");
-				String localDirectory = (isOptionValid(d)) ? d.trim() : directory;
-				a.setDirectory(localDirectory);
+				if (isOptionValid(directory)){
+					String localDirectory = directory.trim();
+					a.setDirectory(localDirectory);
+				}else{
+					throw new RuntimeException(directory + " is not a valid option for destinated directory");
+				}
 				
 				// option "-p packagesname"
-				String p = this.packagename; //m.get("packagename");
-				if (p != null) {
-					if (isPackageNameValid(p)) {
-						String localPackagename = p.trim();
-						a.setPackagename(localPackagename);
-					} else {
-						throw new RuntimeException("package name not valid:" + p.trim());
-					}
+				if (isPackageNameValid(packagename)) {
+					String localPackagename = packagename.trim();
+					a.setPackagename(localPackagename);
 				} else {
-					if (isPackageNameValid(packagename)) {
-						String localPackagename = packagename.trim();
-						a.setPackagename(localPackagename);
-					} else {
-						throw new RuntimeException("package name not valid:" + packagename.trim());
-					}
+					throw new RuntimeException("package name not valid:" + packagename.trim());
 				}
 				
 				// option "--generate-code" or "--no-code"
@@ -167,25 +156,14 @@ public class ObjectMacroCaller extends AbstractMojo {
 				
 				// option "--quiet" or "--informative" or "--verbose"
 				String localInformative = INFORMATIVE;
-				String i = informative;
-				if (i != null) {
-					i = i.trim().toLowerCase();
-					if (i.equals("quiet")) {
-						localInformative = QUIET;
-					} else if (i.equals("verbose")) {
-						localInformative = VERBOSE;
-					} else if (i.equals("informative")) {
-						localInformative = INFORMATIVE;
-					}
-				} else {
-					informative = informative.trim().toLowerCase();
-					if (informative.equals("quiet")) {
-						localInformative = QUIET;
-					} else if (informative.equals("informative")) {
-						localInformative = INFORMATIVE;
-					} else if (informative.equals("verbose")) {
-						localInformative = VERBOSE;
-					}
+				//String i = informative;
+				informative = informative.trim().toLowerCase();
+				if (informative.equals("quiet")) {
+					localInformative = QUIET;
+				} else if (informative.equals("informative")) {
+					localInformative = INFORMATIVE;
+				} else if (informative.equals("verbose")) {
+					localInformative = VERBOSE;
 				}
 				a.setInformative(localInformative);
 				a.setFile(file);
