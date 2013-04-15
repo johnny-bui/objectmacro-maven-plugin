@@ -21,7 +21,20 @@
 				<groupId>de.htwds</groupId>
 				<artifactId>objectmacro-maven-plugin</artifactId>
 				<version>2.0-SNAPSHOT</version>
-				
+				<!-- =============================================
+					All config parameters here are used for 
+					every objectmacro files defined below, unless
+					they are override in the tag <template>
+
+					The default target language is java, which is
+					not shown here. You can use it like 
+					<language>scala</language>.
+
+					To config the flag informativ (-i), quiet (-q), or
+					verbose (-v) you can use the tag 
+					<informativ>informativ|quiet|verbose</informativ>.
+					The default value is informativ.
+				================================================== -->
 				<configuration>
 					<!-- by default code will be generated 
 						(the option -g)
@@ -47,17 +60,47 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>simple-scala-de.htwde-objectmacro</id>
 						<!-- ================================================== 
 							you can define particular options for each template
 							file if you need. These option override the options
 							defined above.
 						==================================================== -->
 						<configuration>
-							<template>src/main/resources/simple.objectmacro</template>
-							<language>scala</language>
-							<packagename>de.htwds</packagename>
-							<directory>${gensource.dir}/objectmacro</directory>
+							<templates>
+								<!-- 
+									a template contains one and only one tag 
+									<file>. The file is the template file, from which
+									you want to generate target code for your templates.
+								-->
+								<template>
+									<file>src/main/resources/sqltemplate.objectmacro</file>
+								</template>
+								<template>
+									<file>src/main/resources/simple.objectmacro</file>
+									<language>scala</language>
+									<packagename>de.htwds</packagename>
+								</template>
+								<!-- 
+									This template has not the <file>-tag, that 
+									causes a Maven warning 
+								-->
+								<template>
+								</template>
+								<template>
+									<file>src/main/resources/notsosimple.objectmacro</file>
+									<!-- 
+										If you use an absolute path for the 
+										destinate directory, you must manual remove the 
+										generate file, since Maven can remove only the directory
+										"target". Furthermore, som IDE cannot recognize the
+										source outside of the target/generated-sources. So
+										absolute path is not recommended
+									-->
+									<!--
+									<directory>/tmp/objectmacro</directory>
+									-->
+								</template>
+							</templates>
 						</configuration>
 						<!-- ===================================================
 							the plugin provides only one goal: objectmacro. This
@@ -67,30 +110,10 @@
 							<goal>objectmacro</goal>
 						</goals>
 					</execution>
-					
-					<execution>
-						<id>notsosimple</id>
-						<configuration>
-							<template>src/main/resources/notsosimple.objectmacro</template>
-							<directory>/tmp/notsosimple</directory>
-						</configuration>
-						<goals>
-							<goal>objectmacro</goal>
-						</goals>
-					</execution>
-
-					<execution>
-						<id>sqltemplate</id>
-						<configuration>
-							<template>src/main/resources/sqltemplate.objectmacro</template>
-						</configuration>
-						<goals>
-							<goal>objectmacro</goal>
-						</goals>
-					</execution>
 				</executions>
 			</plugin>
 
+			
 			<plugin>
 				<groupId>com.github.verylazyboy</groupId>
 				<artifactId>sablecc-maven-plugin</artifactId>
@@ -107,7 +130,6 @@
 							<goal>sablecc</goal>
 						</goals>
 					</execution>
-					
 					<execution>
 						<id>java-1.5-grammar</id>
 						<configuration>
