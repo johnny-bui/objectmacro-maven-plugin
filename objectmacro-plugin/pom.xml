@@ -28,7 +28,28 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!--maven variable which points to your local repository -->
+		<internal.repo.path>file:///home/hbui/mvn-repo/</internal.repo.path>
 	</properties>
+	
+	<distributionManagement>
+		<!-- sonatype -->
+		<!--repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Sonatype Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository -->
+		<repository>
+			<id>internal.repo</id>
+			<name>Internal Repository</name>
+			<url>${internal.repo.path}</url>
+		</repository>
+	</distributionManagement>
 	
 	<build>
 		<plugins>
@@ -66,8 +87,8 @@
 			<artifactId>maven-plugin-annotations</artifactId>
 			<version>3.1</version>
 			<!-- 
- 		annotations are not needed for plugin 
- 		execution so you can remove this dependency
+		annotations are not needed for plugin 
+		execution so you can remove this dependency
 				for execution with using provided scope 
 			-->
 			<!--scope>provided</scope-->
@@ -107,21 +128,9 @@
 		</dependency>
 	</dependencies>
 	
+
 	
-		
-	
-	
-	<distributionManagement>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Sonatype Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+
+
 </project>
 
