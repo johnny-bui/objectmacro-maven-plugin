@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>objectmacro-plugin-user-test</name>
-	<url>https://github.com/verylazyboy/maven-plugin/tree/master/plugin-user-test</url>
+	<url>https://github.com/johnny-bui/maven-plugin/tree/master/plugin-user-test</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -90,33 +90,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>com.github.verylazyboy</groupId>
-				<artifactId>sablecc-maven-plugin</artifactId>
-				<version>2.0-beta.2</version>
-				
-				<executions>
-					<execution>
-						<id>mysql-grammar</id>
-						<configuration>
-							<grammar>src/main/resources/MySQLGrammar.scc</grammar>
-							<destination>${gensource.dir}/mysql</destination>
-						</configuration>
-						<goals>
-							<goal>sablecc</goal>
-						</goals>
-					</execution>
-					
-					<execution>
-						<id>java-1.5-grammar</id>
-						<configuration>
-							<grammar>src/main/resources/java-1.5.scc</grammar>
-							<destination>${gensource.dir}/java</destination>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+			
 		</plugins>	  
 	</build>
 
