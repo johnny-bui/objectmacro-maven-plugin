@@ -1,5 +1,6 @@
 package de.htwds.objectmacroplugin;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ import org.sablecc.objectmacro.launcher.ObjectMacro;
  *
  * @phase generate-resources
  */
-@Mojo(name = "objectmacro", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "objectmacro", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class ObjectMacroCaller extends AbstractMojo {
 
 	/**
@@ -93,10 +94,14 @@ public class ObjectMacroCaller extends AbstractMojo {
 			
 			Argument argv = parseArgument(/*m*/);
 			if (argv != null) {
-				getLog().info("call ObjectMacro with argv:");
-				getLog().info(argv.getArgv().toString());
-				ObjectMacro.compile(argv.getStringArgv());
-
+				if( needCompile( argv.getFile(), argv.getDirectory(), argv.getPackagename() ) ){
+					getLog().info("Call ObjectMacro with argv:");
+					getLog().info(argv.getArgv().toString());
+					ObjectMacro.compile(argv.getStringArgv());
+				}else{
+					getLog().info("No need to compile template " + argv.getFile());
+					getLog().info(" clean output directory to force re-compile template");
+				}
 				getLog().info("add " + argv.getDirectory() + " to resources and test");
 				project.addCompileSourceRoot(argv.getDirectory());
 				project.addTestCompileSourceRoot(argv.getDirectory());
@@ -221,5 +226,29 @@ public class ObjectMacroCaller extends AbstractMojo {
 	private boolean isFileNameValid(String file) {
 		assert file != null;
 		return true;
+	}
+
+	private boolean needCompile(String template, String directory, String packagename) {
+		File templageFile = new File(template);
+		if (templageFile.isFile()){
+			String destinatePath = 
+					directory 
+					+ packagename.replace(".", "/");
+			getLog().info("Check timestamp for the directory: " + destinatePath);
+			File destinateDir = new File(destinatePath);
+			if ( destinateDir.isDirectory() ){ // if the last part of package is already a director
+				long lastModiTemplate = templageFile.lastModified();
+				long lastModiOutputPackage = destinateDir.lastModified();
+				if (lastModiTemplate > lastModiOutputPackage){
+					return true;
+				}else{
+					return false;
+				}
+			}else{// if the last part of the package is not a directory/not exist
+				return true;
+			}
+		}else{
+			return true;
+		}
 	}
 }

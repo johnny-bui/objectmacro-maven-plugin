@@ -20,7 +20,7 @@
 			<plugin>
 				<groupId>de.htwds</groupId>
 				<artifactId>objectmacro-maven-plugin</artifactId>
-				<version>2.0</version>
+				<version>2.1</version>
 				
 				<configuration>
 					<!-- by default code will be generated 
@@ -72,7 +72,7 @@
 						<id>notsosimple</id>
 						<configuration>
 							<template>src/main/resources/notsosimple.objectmacro</template>
-							<directory>/tmp/notsosimple</directory>
+							<!--directory>/tmp/notsosimple</directory-->
 						</configuration>
 						<goals>
 							<goal>objectmacro</goal>
@@ -83,6 +83,7 @@
 						<id>sqltemplate</id>
 						<configuration>
 							<template>src/main/resources/sqltemplate.objectmacro</template>
+							<packagename>de.htwsaarland.hpb.sql</packagename>
 						</configuration>
 						<goals>
 							<goal>objectmacro</goal>

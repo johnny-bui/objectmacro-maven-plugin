@@ -1,6 +1,6 @@
 package de.htwds.pluginusertest;
 
-import de.htwsaarland.sql.imp.template.MCreateTable;
+import de.htwsaarland.hpb.sql.MCreateTable;
 
 
 

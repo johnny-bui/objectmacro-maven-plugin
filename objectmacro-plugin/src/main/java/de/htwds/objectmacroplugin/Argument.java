@@ -34,13 +34,26 @@ public final class Argument {
 		argv.add("-d");
 		argv.add(d);
 	}
-
+	/** 
+	 * need to check timestamp
+	 */
+	public String getDirectory(){
+		return d;
+	}
+	
 	public void setPackagename(String packagename){
 		p = packagename;
 		argv.add("-p");
 		argv.add(p);
 	}
-
+	
+	/**
+	 * need to check timestamp
+	 */
+	public String getPackagename(){
+		return p;
+	}
+	
 	public void setGenerateCode(String generateCode){
 		g = generateCode;
 		argv.add(g);
@@ -60,7 +73,11 @@ public final class Argument {
 		f = file;
 		argv.add(f);
 	}
-
+	
+	public String getFile(){
+		return f;
+	}
+	
 	public String[] getStringArgv(){
 		return argv.toArray(new String[0]);
 	}
@@ -72,8 +89,5 @@ public final class Argument {
 		}
 		return clone;
 	}
-
-	public String getDirectory() {
-		return d;
-	}
+	
 }
