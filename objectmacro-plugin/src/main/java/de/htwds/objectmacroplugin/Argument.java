@@ -1,5 +1,6 @@
 package de.htwds.objectmacroplugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,8 @@ public final class Argument {
 	}
 
 	public void setDirectory(String directory){
-		d = directory;
+		File destinateDir = new File(directory);
+		d = destinateDir.getAbsolutePath();
 		argv.add("-d");
 		argv.add(d);
 	}
@@ -70,7 +72,8 @@ public final class Argument {
 	}
 
 	public void setFile(String file){
-		f = file;
+		File objectMacroFile = new File(file);
+		f = objectMacroFile.getAbsolutePath();
 		argv.add(f);
 	}
 	

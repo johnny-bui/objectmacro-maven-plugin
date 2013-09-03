@@ -61,7 +61,8 @@ public class ObjectMacroCaller extends AbstractMojo {
 	private MavenProject project;
 			
 	private final String fileSep = System.getProperty("file.separator");
-	private String baseDir = System.getProperty("project.basedir");
+	//private String baseDir = System.getProperty("project.basedir");
+	//private String baseDir ;
 	private static final String GEN_CODE = "--generate-code";
 	private static final String NO_CODE = "--no-code";
 	private static final String STRICT = "--strict";
@@ -90,13 +91,14 @@ public class ObjectMacroCaller extends AbstractMojo {
 			if (project == null){
 				getLog().warn("project is null");
 			}
-			constructOutDir();
 			
+			constructOutDir();
 			Argument argv = parseArgument(/*m*/);
 			if (argv != null) {
 				if( needCompile( argv.getFile(), argv.getDirectory(), argv.getPackagename() ) ){
 					getLog().info("Call ObjectMacro with argv:");
 					getLog().info(argv.getArgv().toString());
+					
 					ObjectMacro.compile(argv.getStringArgv());
 				}else{
 					getLog().info("No need to compile template " + argv.getFile());
@@ -138,7 +140,11 @@ public class ObjectMacroCaller extends AbstractMojo {
 				// option "-d directory" // TODO: check validation directory
 				if (isOptionValid(directory)){
 					String localDirectory = directory.trim();
-					a.setDirectory(localDirectory);
+					File outputDir = new File(localDirectory);
+					if (!outputDir.isAbsolute()){
+						outputDir = new File( project.getBasedir(), localDirectory);
+					}
+					a.setDirectory(outputDir.getAbsolutePath());
 				}else{
 					throw new RuntimeException(directory + " is not a valid option for destinated directory");
 				}
@@ -171,7 +177,11 @@ public class ObjectMacroCaller extends AbstractMojo {
 					localInformative = VERBOSE;
 				}
 				a.setInformative(localInformative);
-				a.setFile(file);
+				File templateFile = new File(template);
+				if (!templateFile.isAbsolute()){
+					templateFile = new File(project.getBasedir(),template);
+				}
+				a.setFile(templateFile.getAbsolutePath());
 			} else {
 				getLog().warn("Configuration fail, file name: " + file + " invalid");
 				return null;
@@ -181,12 +191,10 @@ public class ObjectMacroCaller extends AbstractMojo {
 	}
 
 	private String constructOutDir() {
-		if (baseDir == null) {
-			baseDir = ".";
-		}
+		String baseDir = project.getBuild().getOutputDirectory();
 		if (directory == null) {
-			directory = baseDir + fileSep
-					+ "target" + fileSep
+			directory = baseDir 
+					+ fileSep
 					+ "generated-sources" + fileSep
 					+ "objectmacro" + fileSep;
 		} else {
