@@ -92,19 +92,18 @@ public class ObjectMacroCaller extends AbstractMojo {
 				getLog().warn("project is null");
 			}
 			
-			constructOutDir();
-			Argument argv = parseArgument(/*m*/);
+			directory = findOutputDirPath();
+			Argument argv = parseArgument();
 			if (argv != null) {
 				if( needCompile( argv.getFile(), argv.getDirectory(), argv.getPackagename() ) ){
 					getLog().info("Call ObjectMacro with argv:");
 					getLog().info(argv.getArgv().toString());
-					
 					ObjectMacro.compile(argv.getStringArgv());
 				}else{
 					getLog().info("No need to compile template " + argv.getFile());
 					getLog().info(" clean output directory to force re-compile template");
 				}
-				getLog().info("add " + argv.getDirectory() + " to resources and test");
+				getLog().info("Add " + argv.getDirectory() + " to source and test");
 				project.addCompileSourceRoot(argv.getDirectory());
 				project.addTestCompileSourceRoot(argv.getDirectory());
 			}else{
@@ -190,16 +189,14 @@ public class ObjectMacroCaller extends AbstractMojo {
 		return a;
 	}
 
-	private String constructOutDir() {
-		String baseDir = project.getBuild().getOutputDirectory();
+	private String findOutputDirPath() {
 		if (directory == null) {
-			directory = baseDir 
-					+ fileSep
-					+ "generated-sources" + fileSep
-					+ "objectmacro" + fileSep;
+			directory = new File(project.getBasedir(), "target/generated-sources/objectmacro/").getAbsolutePath();
 		} else {
-			if (!directory.endsWith(fileSep)) {
-				directory += fileSep;
+			File outputDir = new File(directory);
+			if (!outputDir.isAbsolute()){
+				outputDir = new File(project.getBasedir(),"target/generated-sources/" + directory);
+				directory = outputDir.getAbsolutePath();
 			}
 		}
 		return directory;

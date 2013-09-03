@@ -37,7 +37,7 @@
 						The default value is
  						${basedir}/target/generated-sources/objectmacro
 					-->
-					<directory>${gensource.dir}/objectmacro</directory>
+					<!--directory>${gensource.dir}/objectmacro</directory-->
 					<!-- This is the destinate package for all template
 						(the option -p packagename).
 

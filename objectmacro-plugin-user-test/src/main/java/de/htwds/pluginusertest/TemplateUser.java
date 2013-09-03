@@ -10,5 +10,6 @@ public class TemplateUser {
 	public void useTemplate(String dummy){
 		MNotSoSimple s = new MNotSoSimple(dummy);
 		System.out.println(s.toString());
+		
 	}
 }
