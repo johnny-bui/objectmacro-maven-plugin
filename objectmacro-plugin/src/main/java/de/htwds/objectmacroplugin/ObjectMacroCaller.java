@@ -16,7 +16,7 @@ import org.apache.maven.project.MavenProject;
 import org.sablecc.objectmacro.launcher.ObjectMacro;
 
 /**
- * Call ObjectMacro to generate Java file from ObjectMacro file.
+ * Call ObjectMacro to generate Java fileName from ObjectMacro fileName.
  *
  * @author Hong Phuc Bui
  * @version 2.0-SNAPSHOT
@@ -122,12 +122,12 @@ public class ObjectMacroCaller extends AbstractMojo {
 	private Argument parseArgument() {
 		Argument a = new Argument();
 		// TODO: optimize here, check the tag <file> first.
-		String file = template;  //m.get("file");
-		if (file == null) {
+		String fileName = template;  //m.get("fileName");
+		if (fileName == null) {
 			getLog().warn("Configuration fail, cannot find the tag <file>");
 			return null;
 		} else {
-			if (isFileNameValid(file)) {
+			if (isFileNameValid(fileName)) {
 				// option "-t language"
 				if(isOptionValid(language)){
 					String localLanguage = language.trim();
@@ -178,11 +178,11 @@ public class ObjectMacroCaller extends AbstractMojo {
 				a.setInformative(localInformative);
 				File templateFile = new File(template);
 				if (!templateFile.isAbsolute()){
-					templateFile = new File(project.getBasedir(),template);
+					templateFile = new File(project.getBasedir(), template);
 				}
 				a.setFile(templateFile.getAbsolutePath());
 			} else {
-				getLog().warn("Configuration fail, file name: " + file + " invalid");
+				getLog().warn("Configuration fail, file name: " + fileName + " invalid");
 				return null;
 			}
 		}

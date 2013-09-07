@@ -4,7 +4,7 @@
 
 	<groupId>de.htwds</groupId>
 	<artifactId>objectmacro-plugin-user-test</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>2.1.2</version>
 	<packaging>jar</packaging>
 
 	<name>objectmacro-plugin-user-test</name>
@@ -20,7 +20,7 @@
 			<plugin>
 				<groupId>de.htwds</groupId>
 				<artifactId>objectmacro-maven-plugin</artifactId>
-				<version>2.1.1</version>
+				<version>2.1.2</version>
 				
 				<configuration>
 					<!-- by default code will be generated 

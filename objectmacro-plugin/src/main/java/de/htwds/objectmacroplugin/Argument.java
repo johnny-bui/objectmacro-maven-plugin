@@ -72,9 +72,8 @@ public final class Argument {
 	}
 
 	public void setFile(String file){
-		File objectMacroFile = new File(file);
-		f = objectMacroFile.getAbsolutePath();
-		argv.add(f);
+		f = file;
+		argv.add(file);
 	}
 	
 	public String getFile(){
