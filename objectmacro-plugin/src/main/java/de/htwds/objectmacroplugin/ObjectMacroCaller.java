@@ -46,20 +46,23 @@ public class ObjectMacroCaller extends AbstractMojo {
 	@Parameter(defaultValue = "true")
 	private boolean strict;
 	/**
-	 * informative => --informativ quite => --quiet verbose => --verbose.
+	 * informative => --informative quite => --quiet verbose => --verbose.
 	 */
 	@Parameter(defaultValue = "informative")
 	private String informative;
-	
-	@Parameter(required=true)
+
+	@Parameter(required = true)
 	private String template;
 
-	@Parameter(defaultValue="${component.org.apache.maven.project.MavenProjectHelper}")
+	@Parameter(defaultValue = "${component.org.apache.maven.project.MavenProjectHelper}")
 	private MavenProjectHelper projectHelper;
-	
-	@Parameter(defaultValue="${project}")
+
+	@Parameter(defaultValue = "${project}")
 	private MavenProject project;
-			
+
+	@Parameter(defaultValue = "${basedir}/src/main/objectmacro")
+	private String objectmacroDirPath;
+	
 	private final String fileSep = System.getProperty("file.separator");
 	//private String baseDir = System.getProperty("project.basedir");
 	//private String baseDir ;
@@ -81,32 +84,32 @@ public class ObjectMacroCaller extends AbstractMojo {
 		packageNameNoGo.add("%");
 		packageNameNoGo.add(" ");
 	}
-	
+
 	public void execute() throws MojoFailureException {
 		try {
-			if (projectHelper==null){
+			if (projectHelper == null) {
 				//getLog().warn("projectHelper is null");
 				projectHelper = new DefaultMavenProjectHelper();
 			}
-			if (project == null){
+			if (project == null) {
 				getLog().warn("project is null");
 			}
-			
+
 			directory = findOutputDirPath();
 			Argument argv = parseArgument();
 			if (argv != null) {
-				if( needCompile( argv.getFile(), argv.getDirectory(), argv.getPackagename() ) ){
+				if (needCompile(argv.getFile(), argv.getDirectory(), argv.getPackagename())) {
 					getLog().info("Call ObjectMacro with argv:");
 					getLog().info(argv.getArgv().toString());
 					ObjectMacro.compile(argv.getStringArgv());
-				}else{
+				} else {
 					getLog().info("No need to compile template " + argv.getFile());
 					getLog().info(" clean output directory to force re-compile template");
 				}
 				getLog().info("Add " + argv.getDirectory() + " to source and test");
 				project.addCompileSourceRoot(argv.getDirectory());
 				project.addTestCompileSourceRoot(argv.getDirectory());
-			}else{
+			} else {
 				//TODO: What is the convenient behavior if there are not 
 				// templated files? I just put an warning out on screen.
 				getLog().warn("no tag <template> found");
@@ -122,32 +125,32 @@ public class ObjectMacroCaller extends AbstractMojo {
 	private Argument parseArgument() {
 		Argument a = new Argument();
 		// TODO: optimize here, check the tag <file> first.
-		String fileName = template;  //m.get("fileName");
+		String fileName = template;
 		if (fileName == null) {
-			getLog().warn("Configuration fail, cannot find the tag <file>");
+			getLog().warn("Configuration fail, cannot find the tag <template>");
 			return null;
 		} else {
 			if (isFileNameValid(fileName)) {
 				// option "-t language"
-				if(isOptionValid(language)){
+				if (isOptionValid(language)) {
 					String localLanguage = language.trim();
 					a.setLanguage(localLanguage);
-				}else{
+				} else {
 					throw new RuntimeException(language + " is not a valid option for output language");
 				}
-				
+
 				// option "-d directory" // TODO: check validation directory
-				if (isOptionValid(directory)){
+				if (isOptionValid(directory)) {
 					String localDirectory = directory.trim();
 					File outputDir = new File(localDirectory);
-					if (!outputDir.isAbsolute()){
-						outputDir = new File( project.getBasedir(), localDirectory);
+					if (!outputDir.isAbsolute()) {
+						outputDir = new File(project.getBasedir(), localDirectory);
 					}
 					a.setDirectory(outputDir.getAbsolutePath());
-				}else{
+				} else {
 					throw new RuntimeException(directory + " is not a valid option for destinated directory");
 				}
-				
+
 				// option "-p packagesname"
 				if (isPackageNameValid(packagename)) {
 					String localPackagename = packagename.trim();
@@ -155,15 +158,15 @@ public class ObjectMacroCaller extends AbstractMojo {
 				} else {
 					throw new RuntimeException("package name not valid:" + packagename.trim());
 				}
-				
+
 				// option "--generate-code" or "--no-code"
 				String localGenerateCode = generateCode ? GEN_CODE : NO_CODE;
 				a.setGenerateCode(localGenerateCode);
-				
+
 				// option "--strict" or "--lenient"
 				String localStrict = strict ? STRICT : LENIENT;
 				a.setStrict(localStrict);
-				
+
 				// option "--quiet" or "--informative" or "--verbose"
 				String localInformative = INFORMATIVE;
 				//String i = informative;
@@ -176,10 +179,8 @@ public class ObjectMacroCaller extends AbstractMojo {
 					localInformative = VERBOSE;
 				}
 				a.setInformative(localInformative);
-				File templateFile = new File(template);
-				if (!templateFile.isAbsolute()){
-					templateFile = new File(project.getBasedir(), template);
-				}
+				File templateFile = guessTemplaceFile(template);
+				
 				a.setFile(templateFile.getAbsolutePath());
 			} else {
 				getLog().warn("Configuration fail, file name: " + fileName + " invalid");
@@ -189,13 +190,27 @@ public class ObjectMacroCaller extends AbstractMojo {
 		return a;
 	}
 
+	private File guessTemplaceFile(String templaceParam) {
+		if (templaceParam.contains(File.separator)) {
+			File templateFile = new File(templaceParam);
+			if (!templateFile.isAbsolute()) {
+				templateFile = new File(project.getBasedir(), templaceParam);
+			}
+			return templateFile;
+		}else{
+			File objectMacroDir = new File(objectmacroDirPath);
+			File templateFile = new File(objectMacroDir, templaceParam);
+			return templateFile;
+		}
+	}
+
 	private String findOutputDirPath() {
 		if (directory == null) {
 			directory = new File(project.getBasedir(), "target/generated-sources/objectmacro/").getAbsolutePath();
 		} else {
 			File outputDir = new File(directory);
-			if (!outputDir.isAbsolute()){
-				outputDir = new File(project.getBasedir(),"target/generated-sources/" + directory);
+			if (!outputDir.isAbsolute()) {
+				outputDir = new File(project.getBasedir(), "target/generated-sources/" + directory);
 				directory = outputDir.getAbsolutePath();
 			}
 		}
@@ -235,24 +250,24 @@ public class ObjectMacroCaller extends AbstractMojo {
 
 	private boolean needCompile(String template, String directory, String packagename) {
 		File templageFile = new File(template);
-		if (templageFile.isFile()){
-			String destinatePath = 
-					directory 
+		if (templageFile.isFile()) {
+			String destinatePath
+					= directory
 					+ packagename.replace(".", "/");
 			getLog().info("Check timestamp for the directory: " + destinatePath);
 			File destinateDir = new File(destinatePath);
-			if ( destinateDir.isDirectory() ){ // if the last part of package is already a director
+			if (destinateDir.isDirectory()) { // if the last part of package is already a director
 				long lastModiTemplate = templageFile.lastModified();
 				long lastModiOutputPackage = destinateDir.lastModified();
-				if (lastModiTemplate > lastModiOutputPackage){
+				if (lastModiTemplate > lastModiOutputPackage) {
 					return true;
-				}else{
+				} else {
 					return false;
 				}
-			}else{// if the last part of the package is not a directory/not exist
+			} else {// if the last part of the package is not a directory/not exist
 				return true;
 			}
-		}else{
+		} else {
 			return true;
 		}
 	}
