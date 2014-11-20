@@ -28,8 +28,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!--maven variable which points to your local repository -->
-		<internal.repo.path>file:///home/hbui/mvn-repo/</internal.repo.path>
 	</properties>
 	
 	<distributionManagement>
