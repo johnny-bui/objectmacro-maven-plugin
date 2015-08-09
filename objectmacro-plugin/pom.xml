@@ -29,20 +29,19 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
-	<distributionManagement>
-		<repository>
-			<id>newton</id>
-			<name>newton-releases</name>
-			<url>http://newton.htw-saarland.de:8085/artifactory/ext-release-local</url>
-		</repository>
-		<snapshotRepository>
-			<id>newton</id>
-			<name>newton-snapshots</name>
-			<url>http://newton.htw-saarland.de:8085/artifactory/ext-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
-	
+	 <distributionManagement>
+        <repository>
+            <id>newton</id>
+            <name>newton-releases</name>
+            <url>http://newton.htwsaar.de/artifactory/plugins-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>newton</id>
+            <name>newton-snapshots</name>
+            <url>http://newton.htwsaar.de/artifactory/plugins-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
