@@ -82,6 +82,7 @@ public class ObjectMacroCaller extends AbstractMojo {
 		packageNameNoGo.add("?");
 		packageNameNoGo.add("/");
 		packageNameNoGo.add("%");
+		packageNameNoGo.add("$");
 		packageNameNoGo.add(" ");
 	}
 
