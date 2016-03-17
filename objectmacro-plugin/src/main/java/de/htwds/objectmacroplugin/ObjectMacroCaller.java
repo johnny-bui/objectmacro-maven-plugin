@@ -7,7 +7,9 @@ import java.util.Set;
 import org.apache.maven.project.MavenProjectHelper;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -62,6 +64,12 @@ public class ObjectMacroCaller extends AbstractMojo {
 
 	@Parameter(defaultValue = "${basedir}/src/main/objectmacro")
 	private String objectmacroDirPath;
+	
+	@Parameter(defaultValue = "${basedir}/src/test/objectmacro")
+	private String objectmacroTestDirPath;
+	
+	@Component
+	private MojoExecution execution;
 	
 	private final String fileSep = System.getProperty("file.separator");
 	//private String baseDir = System.getProperty("project.basedir");
@@ -193,26 +201,44 @@ public class ObjectMacroCaller extends AbstractMojo {
 
 	private File guessTemplaceFile(String templaceParam) {
 		if (templaceParam.contains(File.separator)) {
-			File templateFile = new File(templaceParam);
-			if (!templateFile.isAbsolute()) {
-				templateFile = new File(project.getBasedir(), templaceParam);
-			}
-			return templateFile;
+				File templateFile = new File(templaceParam);
+				if (!templateFile.isAbsolute()) {
+					templateFile = new File(project.getBasedir(), templaceParam);
+				}
+				return templateFile;
 		}else{
-			File objectMacroDir = new File(objectmacroDirPath);
-			File templateFile = new File(objectMacroDir, templaceParam);
-			return templateFile;
+			if (execution.getLifecyclePhase().equals(LifecyclePhase.GENERATE_TEST_SOURCES.id()) ){
+				File objectMacroDir = new File(objectmacroTestDirPath);
+				File templateFile = new File(objectMacroDir, templaceParam);
+				return templateFile;
+			}else{
+				File objectMacroDir = new File(objectmacroDirPath);
+				File templateFile = new File(objectMacroDir, templaceParam);
+				return templateFile;
+			}
 		}
 	}
 
 	private String findOutputDirPath() {
-		if (directory == null) {
-			directory = new File(project.getBasedir(), "target/generated-sources/objectmacro/").getAbsolutePath();
-		} else {
-			File outputDir = new File(directory);
-			if (!outputDir.isAbsolute()) {
-				outputDir = new File(project.getBasedir(), "target/generated-sources/" + directory);
-				directory = outputDir.getAbsolutePath();
+		if (execution.getLifecyclePhase().equals(LifecyclePhase.GENERATE_TEST_SOURCES.id())){
+			if (directory == null) {
+				directory = new File(project.getBasedir(), "target/generated-test-sources/objectmacro/").getAbsolutePath();
+			} else {
+				File outputDir = new File(directory);
+				if (!outputDir.isAbsolute()) {
+					outputDir = new File(project.getBasedir(), "target/generated-test-sources/" + directory);
+					directory = outputDir.getAbsolutePath();
+				}
+			}
+		}else{
+			if (directory == null) {
+				directory = new File(project.getBasedir(), "target/generated-sources/objectmacro/").getAbsolutePath();
+			} else {
+				File outputDir = new File(directory);
+				if (!outputDir.isAbsolute()) {
+					outputDir = new File(project.getBasedir(), "target/generated-sources/" + directory);
+					directory = outputDir.getAbsolutePath();
+				}
 			}
 		}
 		return directory;
